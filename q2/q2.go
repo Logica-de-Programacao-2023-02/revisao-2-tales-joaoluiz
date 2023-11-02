@@ -34,7 +34,7 @@ func CalculateTeams(participants []Participant) int {
 	total = prog + math
 
 	if prog == 0 || math == 0 {
-		return 0git 
+		return 0
 	}
 
 	switch {
