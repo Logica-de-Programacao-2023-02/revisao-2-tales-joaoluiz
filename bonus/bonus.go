@@ -44,11 +44,12 @@ type Shirt struct {
 func CalculateAveragePrice(shirts []Shirt) (max float64, min float64, err error) {
 	var finalSmallPrice, finalLargePrice []float64
 	var finalSmallSize, finalLargeSize []string
+	var divisorSmall, divisorLarge float64
 	var mediaSmall, mediaLarge float64
 	var sumSmall, sumLarge float64
 	var xCountS, xCountL int
 
-	countXMap := make(map[string]int)
+	//countXMap := make(map[string]int)
 
 	var (
 		smallPrice  []float64
@@ -81,85 +82,190 @@ func CalculateAveragePrice(shirts []Shirt) (max float64, min float64, err error)
 		}
 	}
 
-	if len(slicePriceS) == 0 && len(slicePriceM) == 0 && len(slicePriceL) > 0 {
-		smallPrice = slicePriceL
-		smallSize = sliceSizeL
-		largePrice = slicePriceL
-		largeSize = sliceSizeL
-	} else if len(slicePriceM) == 0 && len(slicePriceL) == 0 && len(slicePriceS) > 0 {
-		smallPrice = slicePriceS
+	//smallSize / Price, largeSize / Price
+	//tem o com M e S ------ len(sliceSizeS) > 0 && len(sliceSizeM) > 0 && len(sliceSizeL) == 0
+	//tem 2 com S, M e L --- len(sliceSizeS) > 0 && len(sliceSizeM) > 0 && len(sliceSizeL) > 0
+	//tem o que só tem L --- len(sliceSizeS) == 0 && len(sliceSizeM) == 0 && len(sliceSizeL) > 0
+	//tem o que só tem S --- len(sliceSizeS) > 0 && len(sliceSizeM) == 0 && len(sliceSizeL) == 0
+
+	if len(sliceSizeS) > 0 && len(sliceSizeM) > 0 && len(sliceSizeL) == 0 {
 		smallSize = sliceSizeS
-		largePrice = slicePriceS
-		largeSize = sliceSizeS
-	} else if len(slicePriceL) == 0 && len(slicePriceL) > 0 && len(slicePriceL) > 0 {
 		smallPrice = slicePriceS
-		smallSize = sliceSizeS
-		largePrice = slicePriceM
 		largeSize = sliceSizeM
-	} else {
-		smallPrice = slicePriceS
+		largePrice = slicePriceM
+
+		for _, size := range smallSize {
+			if len(size) > xCountS {
+				xCountS = len(size)
+			}
+		}
+
+		for _, size := range largeSize {
+			if len(size) > xCountL {
+				xCountL = len(size)
+			}
+		}
+
+		for i, size := range smallSize {
+			if len(size) == xCountS {
+				finalSmallPrice = append(finalSmallPrice, smallPrice[i])
+				finalSmallSize = append(finalSmallSize, size)
+			}
+		}
+
+		for i, size := range largeSize {
+			if len(size) == xCountL {
+				finalLargePrice = append(finalLargePrice, largePrice[i])
+				finalLargeSize = append(finalLargeSize, size)
+			}
+		}
+
+		divisorSmall = float64(len(finalSmallSize))
+		divisorLarge = float64(len(finalLargeSize))
+
+		for _, price := range finalSmallPrice {
+			sumSmall += price
+		}
+
+		for _, price := range finalLargePrice {
+			sumLarge += price
+		}
+	}
+
+	if len(sliceSizeS) > 0 && len(sliceSizeM) > 0 && len(sliceSizeL) > 0 {
 		smallSize = sliceSizeS
-		largePrice = slicePriceL
+		smallPrice = slicePriceS
 		largeSize = sliceSizeL
-	}
+		largePrice = slicePriceL
 
-	for _, size := range largeSize {
-		for _, char := range size {
-			if string(char) == "X" {
-				countXMap["X"]++
+		for _, size := range smallSize {
+			if len(size) > xCountS {
+				xCountS = len(size)
 			}
 		}
 
-		if countXMap["X"] > xCountL {
-			xCountL = countXMap["X"]
-		}
-
-		delete(countXMap, "X")
-	}
-
-	for _, size := range smallSize {
-		for _, char := range size {
-			if string(char) == "X" {
-				countXMap["X"]++
-			}
-
-			if countXMap["X"] > xCountS {
-				xCountS = countXMap["X"]
+		for _, size := range largeSize {
+			if len(size) > xCountL {
+				xCountL = len(size)
 			}
 		}
 
-		delete(countXMap, "X")
-	}
+		for i, size := range smallSize {
+			if len(size) == xCountS {
+				finalSmallPrice = append(finalSmallPrice, smallPrice[i])
+				finalSmallSize = append(finalSmallSize, size)
+			}
+		}
 
-	for i, size := range largeSize {
-		if len(size) == xCountL {
-			finalLargePrice = append(finalLargePrice, largePrice[i])
-			finalLargeSize = append(finalLargeSize, size)
+		for i, size := range largeSize {
+			if len(size) == xCountL {
+				finalLargePrice = append(finalLargePrice, largePrice[i])
+				finalLargeSize = append(finalLargeSize, size)
+			}
+		}
+
+		divisorSmall = float64(len(finalSmallSize))
+		divisorLarge = float64(len(finalLargeSize))
+
+		for _, price := range finalSmallPrice {
+			sumSmall += price
+		}
+
+		for _, price := range finalLargePrice {
+			sumLarge += price
 		}
 	}
 
-	for i, size := range smallSize {
-		if len(size) == xCountS {
-			finalSmallPrice = append(finalSmallPrice, smallPrice[i])
-			finalSmallSize = append(finalSmallSize, size)
+	if len(sliceSizeS) == 0 && len(sliceSizeM) == 0 && len(sliceSizeL) > 0 {
+		smallSize = sliceSizeL
+		smallPrice = slicePriceL
+		largeSize = sliceSizeL
+		largePrice = slicePriceL
+
+		//para o menor ter um tamanho inicial
+		xCountS = len(largeSize[0])
+
+		for _, size := range largeSize {
+			if len(size) < xCountS {
+				xCountS = len(size)
+			}
+
+			if len(size) > xCountL {
+				xCountL = len(size)
+			}
+		}
+
+		for i, size := range largeSize {
+			if len(size) == xCountS {
+				finalSmallPrice = append(finalSmallPrice, smallPrice[i])
+				finalSmallSize = append(finalSmallSize, size)
+			}
+
+			if len(size) == xCountL {
+				finalLargePrice = append(finalLargePrice, largePrice[i])
+				finalLargeSize = append(finalLargeSize, size)
+			}
+		}
+
+		divisorSmall = float64(len(finalSmallSize))
+		divisorLarge = float64(len(finalLargeSize))
+
+		for _, price := range finalSmallPrice {
+			sumSmall += price
+		}
+
+		for _, price := range finalLargePrice {
+			sumLarge += price
 		}
 	}
 
-	divisorLarge := float64(len(finalLargeSize))
-	divisorSmall := float64(len(finalSmallSize))
+	if len(sliceSizeS) > 0 && len(sliceSizeM) == 0 && len(sliceSizeL) == 0 {
+		smallSize = sliceSizeS
+		smallPrice = slicePriceS
+		largeSize = sliceSizeS
+		largePrice = slicePriceS
 
-	for _, price := range finalLargePrice {
-		sumLarge += price
-		mediaLarge = sumLarge / divisorLarge
+		//para o menor ter um tamanho inicial
+		xCountS = len(smallSize[0])
+
+		for _, size := range smallSize {
+			if len(size) < xCountS {
+				xCountS = len(size)
+			}
+
+			if len(size) > xCountL {
+				xCountL = len(size)
+			}
+		}
+
+		for i, size := range smallSize {
+			//quanto menor a quantidade de X, maior a camisa
+			if len(size) == xCountS {
+				finalLargePrice = append(finalLargePrice, largePrice[i])
+				finalLargeSize = append(finalLargeSize, size)
+			}
+
+			//quanto maior a quantidade de X, menor a camisa
+			if len(size) == xCountL {
+				finalSmallPrice = append(finalSmallPrice, smallPrice[i])
+				finalSmallSize = append(finalSmallSize, size)
+			}
+		}
+
+		divisorSmall = float64(len(finalSmallSize))
+		divisorLarge = float64(len(finalLargeSize))
+
+		for _, price := range finalSmallPrice {
+			sumSmall += price
+		}
+
+		for _, price := range finalLargePrice {
+			sumLarge += price
+		}
 	}
 
-	for _, price := range finalSmallPrice {
-		sumSmall += price
-		mediaSmall = sumSmall / divisorSmall
-	}
-
-	//mediaLarge = sumLarge / float64(len(finalLargePrice))
-	//mediaSmall = sumSmall / float64(len(finalSmallSize))
+	mediaSmall = sumSmall / divisorSmall
+	mediaLarge = sumLarge / divisorLarge
 
 	return mediaLarge, mediaSmall, nil
 }
