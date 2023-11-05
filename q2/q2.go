@@ -21,5 +21,30 @@ type Participant struct {
 }
 
 func CalculateTeams(participants []Participant) int {
-	return 0
+	var total, math, prog int
+
+	for _, participant := range participants {
+		if participant.Role == "Mathematician" {
+			math++
+		} else {
+			prog++
+		}
+	}
+
+	total = prog + math
+
+	if prog == 0 || math == 0 {
+		return 0
+	}
+
+	switch {
+	case total/4 < prog && total/4 < math:
+		return total / 4
+	case math < total/4 && math < prog:
+		return math
+	case prog < total/4 && prog < math:
+		return prog
+	default:
+		return prog
+	}
 }

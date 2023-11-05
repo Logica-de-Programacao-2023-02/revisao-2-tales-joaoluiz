@@ -1,5 +1,9 @@
 package q3
 
+import (
+	"fmt"
+)
+
 //O cozinheiro Remy preparou uma refeição para si mesmo e, enquanto almoçava, decidiu assistir a um vídeo no RataTube. No
 //entanto, ele tem um tempo limitado de 𝑡 segundos para o almoço. Ele pediu a sua ajuda para escolher o vídeo ideal.
 //
@@ -18,5 +22,27 @@ type Video struct {
 }
 
 func ChooseVideo(videos []Video, time int) (Video, error) {
-	return Video{}, nil
+	var maxEntertainmentVideo Video
+
+	//caso nenhum video seja achado (ultimo if) esse if se torna obsoleto
+	//if time == 0 || len(videos) == 0 {
+	//	return Video{}, fmt.Errorf("cannot be zero")
+	//}
+
+	for _, video := range videos {
+		if time >= video.Duration && video.Entertainment > maxEntertainmentVideo.Entertainment {
+			maxEntertainmentVideo = video
+		}
+
+		time--
+	}
+
+	//caso o tempo não seja o suficiente para nenhum video o entreterimento do maxEntertainmenteVideo
+	//vai ser 0, porque ele inicia totalmente zerado no inicio e não entra no if do loop
+	//entao o cara não acha nenhum video
+	if maxEntertainmentVideo.Entertainment == 0 {
+		return Video{}, fmt.Errorf("no video found")
+	}
+
+	return maxEntertainmentVideo, nil
 }
